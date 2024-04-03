@@ -1,0 +1,425 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+        }
+
+        #main-header {
+            background-color: #007bff;
+            color: white;
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+
+        #sub-header {
+            background-color: #f4f4f4;
+            padding: 10px;
+            width: 100%;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        #buttons-container {
+            display: flex;
+            justify-content: space-around;
+            width: 100%;
+            padding: 20px 0;
+            background-color: #007bff;
+			gap: 10px;
+			margin-top: 20px;
+        }
+
+        #buttons-container button {
+            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        #buttons-container button.active {
+            background-color: #0056b3;
+        }
+
+        #buttons-container button:hover {
+            background-color: #0056b3;
+        }
+		.action-button {
+			font-size: 16px;
+			padding: 10px 20px;
+			border: none;
+			background-color: #28a745; /* Same color as "Upload Images" and "Get Attendance" */
+			color: white;
+			cursor: pointer;
+			border-radius: 5px;
+			margin: 0 5px; /* Add margin for spacing between buttons */
+		}
+        #video-feed-container,
+        #upload-container,
+        #student-registration-container {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+			margin-top: 20px;
+        }
+
+        #video-container {
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        #cam {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px 10px 0 0;
+        }
+
+		#video-container h1,
+        #buttons-container h1 {
+            margin: 0; 
+        }
+
+        button {
+            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #007bff;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+
+        input[type="file"] {
+            display: none;
+        }
+
+        #image-upload-label {
+            font-size: 16px;
+            background-color: #007bff;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-right: 10px;
+            margin-top: 20px;
+        }
+
+        #download-link {
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+        }
+
+        #excel-download {
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            text-decoration: none;
+        }
+
+        #selected-images {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .selected-image {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100px;
+            height: 120px;
+            margin: 5px;
+        }
+
+        .selected-image img {
+            max-width: 100px;
+            max-height: 100px;
+            border-radius: 10px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .selected-image p {
+            margin-top: 5px;
+            font-size: 12px;
+            text-align: center;
+        }
+		#student-registration-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-top: 20px;
+        }
+		#get-attendance-button {
+            margin-top: 20px; 
+        }
+
+        #student-registration-form h1 {
+            font-size: 24px;
+            margin-bottom: 10px;
+        }
+
+        #student-registration-form input {
+            margin: 5px 0;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        #student-registration-form button {
+            font-size: 16px;
+            padding: 10px 20px;
+            border: none;
+            background-color: #28a745;
+            color: white;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-top: 10px;
+        }
+
+    </style>
+</head>
+<body>
+	<div id="main-header">
+		<h1 style="color: #ff6347;">Attendance System</h1>
+    </div>
+
+    <div id="sub-header">
+        <h2>Attendance System</h2>
+    </div>
+    <div id="buttons-container">
+        <button id="register-button">Register Student</button>
+        <button id="attendance-button">Get Attendance</button>
+    </div>
+	<div id="message-container" style="display: none; color: red; align: center;font-size: 20pt"></div>
+    <div id="student-registration-container">
+        <h1 style="text-align: center; padding: 10px;">Register Student</h1>
+        <form id="student-registration-form">
+            <h1>Register Student</h1>
+            <input type="text" id="student-number" placeholder="Student Number">
+            <label for="student-image" id="image-upload-label">Upload Student Image</label>
+            <input type="file" id="student-image" accept=".jpg, .jpeg, .png" multiple>
+            <button type="submit">Register</button>
+
+        </form>
+    </div>
+
+    <div id="video-feed-container">
+        <div id="video-container">
+            <h1 style="text-align: center; padding: 10px;">Camera Video</h1>
+            <img id="cam" src="">
+        </div>
+        <div id="buttons-container">
+		<button class="action-button" id="start-button">Start Camera</button>
+<button class="action-button" id="stop-button">Stop Camera</button>
+        </div>
+    </div>
+    <div id="upload-container">
+        <div id="upload-content">
+            <label for="image-upload" id="image-upload-label">Upload Images</label>
+            <input type="file" id="image-upload" accept=".jpg, .jpeg, .png" multiple>
+            <button id="get-attendance-button">Get Attendance</button>
+        </div>
+        <div id="selected-images" style="display: none;"></div>
+        <div id="download-link" style="display: none;">
+            <a id="excel-download" href="#" download>Download Excel</a>
+        </div>
+    </div>
+    <script>
+        const registerButton = document.getElementById("register-button");
+        const attendanceButton = document.getElementById("attendance-button");
+        const studentRegistrationContainer = document.getElementById("student-registration-container");
+        const videoFeedContainer = document.getElementById("video-feed-container");
+        const uploadContainer = document.getElementById("upload-container");
+        const video = document.getElementById("cam");
+        const startButton = document.getElementById("start-button");
+        const stopButton = document.getElementById("stop-button");
+        const imageUpload = document.getElementById("image-upload");
+        const downloadLink = document.getElementById("download-link");
+        const excelDownload = document.getElementById("excel-download");
+        const getAttendanceButton = document.getElementById("get-attendance-button");
+        const studentRegistrationForm = document.getElementById("student-registration-form");
+        const studentNumberInput = document.getElementById("student-number");
+        const studentImageInput = document.getElementById("student-image");
+        let selectedImage = null; // To store the selected image files
+        
+        registerButton.addEventListener("click", () => {
+            studentRegistrationContainer.style.display = "flex";
+            videoFeedContainer.style.display = "none";
+            uploadContainer.style.display = "none";
+        });
+
+        attendanceButton.addEventListener("click", () => {
+            studentRegistrationContainer.style.display = "none";
+            videoFeedContainer.style.display = "flex";
+            uploadContainer.style.display = "flex";
+        });
+
+        imageUpload.addEventListener("change", (event) => {
+			clearMessage()
+            selectedImage = event.target.files;
+            const selectedImagesDiv = document.getElementById("selected-images");
+            downloadLink.style.display = "none";
+            selectedImagesDiv.style.display = "flex";
+            selectedImagesDiv.innerHTML = "";
+
+            for (let i = 0; i < selectedImage.length; i++) {
+                const selectedImageContainer = document.createElement("div");
+                selectedImageContainer.className = "selected-image";
+
+                const imgElement = document.createElement("img");
+                imgElement.src = URL.createObjectURL(selectedImage[i]);
+                imgElement.alt = selectedImage[i].name;
+
+                const caption = document.createElement("p");
+                caption.textContent = selectedImage[i].name;
+
+                selectedImageContainer.appendChild(imgElement);
+                selectedImageContainer.appendChild(caption);
+
+                selectedImagesDiv.appendChild(selectedImageContainer);
+            }
+        });
+
+		getAttendanceButton.addEventListener("click", async () => {
+			if (selectedImage && selectedImage.length > 0) {
+					try {
+						clearMessage()
+						const formData = new FormData();
+					for (let i = 0; i < selectedImage.length; i++) {
+						formData.append("images", selectedImage[i]);
+					}
+
+					const response = await fetch("/process_images", {
+						method: "POST",
+						body: formData,
+					});
+
+					if (response.ok) {
+						
+						showMessage("Attendance fetched successfully! Download will start shortly.", true);
+						const blob = await response.blob();
+						const url = URL.createObjectURL(blob);
+						downloadLink.style.display = "block";
+						excelDownload.href = url;
+						excelDownload.download = "attendance marker.xlsx";
+					} else {
+						throw new Error("Failed to get attendance. Please try again.");
+					}
+				} catch (error) {
+					console.error("Error fetching attendance", error);
+					showMessage(error.toString(), false);
+				}
+			} else {
+				showMessage("No images selected to get attendance.", false);
+			}
+		});
+
+
+        startButton.addEventListener("click", async () => {
+			clearMessage()
+            video.src = "{{ url_for('video_feed') }}";
+        });
+
+		stopButton.addEventListener('click', function() {
+			// Clear video and UI elements first for immediate feedback
+			video.src = "";
+			selectedImage = null;
+			downloadLink.style.display = "none";
+			const messageContainer = document.getElementById('message-container');
+			
+			// Then send the stop signal to the server
+			fetch('/stop_camera', {
+				method: 'POST'
+			})
+			.then(response => {
+				if (response.ok) return response.json();
+				throw new Error('Request failed.');
+			})
+			.then(data => {
+				if(data.status === 'success'){
+					// If server stopped the camera successfully, trigger download
+					window.location = '/download_attendance';
+					// Provide user feedback for success
+					messageContainer.textContent = 'Camera stopped successfully and attendance downloaded.';
+					messageContainer.style.display = 'block';
+					messageContainer.style.color = 'green'; // success color
+				} else {
+					// Provide user feedback for a non-success status
+					messageContainer.textContent = 'There was a problem stopping the camera. Status: ' + data.status;
+					messageContainer.style.display = 'block';
+				}
+			})
+			.catch(error => {
+				console.error('Error stopping camera:', error);
+				// Provide user feedback for an error
+				messageContainer.textContent = 'Error stopping the camera: ' + error.message;
+				messageContainer.style.display = 'block';
+			});
+		});
+
+
+		function showMessage(message, isSuccess = true) {
+			const messageContainer = document.getElementById("message-container");
+			messageContainer.style.display = "block";
+			messageContainer.textContent = message;
+			messageContainer.style.color = isSuccess ? "green" : "red"; // Success messages in green, errors in red
+		}
+		function clearMessage() {
+			const messageContainer = document.getElementById("message-container");
+			messageContainer.style.display = "none";
+			messageContainer.textContent = '';
+		}
+		studentRegistrationForm.addEventListener("submit", async (event) => {
+			event.preventDefault();
+			try {
+				clearMessage()
+				const formData = new FormData();
+				formData.append("studentNumber", studentNumberInput.value);
+				formData.append("studentImage", studentImageInput.files[0]);
+
+				const response = await fetch("/register_student", {
+					method: "POST",
+					body: formData,
+				});
+
+				if (response.ok) {
+					showMessage("Student registered successfully!", true);
+				} else {
+					throw new Error(" Student details exist. Error registering student");
+				}
+			} catch (error) {
+				console.error("Error registering student", error);
+				showMessage(error.toString(), false);
+			}
+		});
+    </script>
+</body>
+</html>
